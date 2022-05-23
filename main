@@ -139,4 +139,4 @@ try:
     print("Program time: " + str(result) + " seconds.")
 
 except ValueError:
-    print("agdfag")
+    print("\nЭто не число")
