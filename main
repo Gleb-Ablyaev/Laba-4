@@ -1,0 +1,142 @@
+import random
+import time
+
+
+def print_matrix(M, matr_name, tt):
+    print("матрица " + matr_name + " промежуточное время = " + str(format(tt, '0.2f')) + " seconds.")
+    for i in M:  # делаем перебор всех строк матрицы
+        for j in i:  # перебираем все элементы в строке
+            print("%5d" % j, end=' ')
+        print()
+
+
+print("\n-----Результат работы программы-------")
+try:
+    row_q = int(input("Введите количество строк (столбцов) квадратной матрицы в интервале от 6 до 100:"))
+    while row_q < 6 or row_q > 100:
+        row_q = int(input(
+            "Вы ввели неверное число\nВведите количество строк (столбцов) квадратной матрицы в интервале от 6 до 100:"))
+    K = int(input("Введите число К="))
+    start = time.time()
+    A, F, KAF, AT = [], [], [], []  # задаем матрицы
+    for i in range(row_q):
+        A.append([0] * row_q)
+        F.append([0] * row_q)
+        KAF.append([0] * row_q)
+        AT.append([0] * row_q)
+    time_next = time.time()
+    print_matrix(F, "F", time_next - start)
+
+    for i in range(row_q):  # заполняем матрицу А
+        for j in range(row_q):
+            A[i][j] = random.randint(-10, 10)
+
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(A, "A", time_next - time_prev)
+    for i in range(row_q):  # F
+        for j in range(row_q):
+            F[i][j] = A[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(F, "F", time_next - time_prev)
+
+    B = []  # Задаем матрицу B
+    size = row_q // 2
+    for i in range(size):
+        B.append([0] * size)
+
+    for i in range(size):  # Формируем подматрицу B
+        for j in range(size):
+            B[i][j] = F[i][j-size]
+
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(B, "B", time_next - time_prev)
+
+    kolvo = 0
+    summ = 0
+    for i in range(size):
+        for j in range(size):
+            if i > j and i % 2 != 0 and i < size - j - 1 and B[i][j] < K:
+                kolvo += 1
+
+    E = []  # Задаем матрицу Е
+    size = row_q // 2
+    for i in range(size):
+        E.append([0] * size)
+
+    for i in range(size):  # Формируем подматрицу E
+        for j in range(size):
+            E[i][j] = F[i][j]
+
+    for i in range(size):  # Обрабатываем подматрицу E
+        for j in range(size):
+            if i < j and j % 2 == 0 and i < size - j - 1:
+                summ += E[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(E, "E", time_next - time_prev)
+
+    if kolvo > summ:
+        for i in range(size):  # Меняем подматрицу Е
+            for j in range(size):
+                for i in range(size):  # меняем подматрицу E
+                    for j in range(size):
+                        if (i < j) and (i > size - 1 - j):
+                            E[i][j], E[j][i] = E[j][i], E[i][j]
+        print_matrix(E, "E", time_next - time_prev)
+        for i in range(size):  # Формируем матрицу F
+            for j in range(size):
+                F[i][j] = E[i][j]
+        print_matrix(F, "F!", time_next - time_prev)
+    else:
+        for i in range(row_q // 2):  # меняем подматрицы B и E
+            for j in range(row_q // 2):
+                F[i][j], F[i][row_q // 2 + j] = F[i][row_q // 2 + j], F[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(F,"F",time_next-time_prev)
+
+    for i in range(row_q):  # K*A
+        for j in range(row_q):
+            F[i][j] = K * A[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(F, "K*F", time_next - time_prev)
+
+    for i in range(row_q):  # (K*A)*F
+        for j in range(row_q):
+            for p in range(row_q):
+                KAF[i][j] += A[i][p] * F[p][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(KAF, "K*A*F", time_next - time_prev)
+
+    for i in range(row_q):  # AT
+        for j in range(i, row_q, 1):
+            AT[i][j], AT[j][i] = F[j][i], F[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(AT, "A^T", time_next - time_prev)
+
+    for i in range(row_q):  # K*AT
+        for j in range(row_q):
+            AT[i][j] = K * AT[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(AT, "K*AT", time_next - time_prev)
+
+    for i in range(row_q):  # (K*A)*F-K*AT
+        for j in range(row_q):
+            KAF[i][j] = KAF[i][j] - AT[i][j]
+    time_prev = time_next
+    time_next = time.time()
+    print_matrix(KAF, "(K*A)*F-K*A^T", time_next - time_prev)
+
+    finish = time.time()
+    result = finish - start
+    print("Program time: " + str(result) + " seconds.")
+
+except ValueError:
+    print("agdfag")
